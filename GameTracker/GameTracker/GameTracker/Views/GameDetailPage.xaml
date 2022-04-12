@@ -52,8 +52,16 @@
                     Padding="0,30,0,0"
                     HorizontalOptions="CenterAndExpand"
                     Orientation="Horizontal">
-                    <Button Command="{Binding DeleteCommand}" Text="Delete" />
-                    <Button Command="{Binding EditCommand}" Text="Edit" />
+                    <Button
+                        x:Name="deleteItem"
+                        Clicked="deleteItem_Clicked"
+                        Command="{Binding DeleteCommand}"
+                        Text="Delete" />
+                    <Button
+                        x:Name="editItem"
+                        Clicked="editItem_Clicked"
+                        Command="{Binding EditCommand}"
+                        Text="Edit" />
                 </StackLayout>
             </StackLayout>
         </Grid>

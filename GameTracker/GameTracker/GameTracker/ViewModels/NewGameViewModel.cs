@@ -62,6 +62,7 @@ namespace GameTracker.ViewModels
             if (gameId == 0)
                 return;
 
+            Title = "Edit game";
             Game = await GameService.GetGame(gameId);
             Name = Game.Name;
             Rating = Game.Rating.ToString();

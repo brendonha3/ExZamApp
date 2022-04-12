@@ -1,23 +1,22 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<ContentPage Title="{Binding Title}" 
-             xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:viewmodel="clr-namespace:GameTracker.ViewModels" 
-             xmlns:xct="http://xamarin.com/schemas/2020/toolkit"
-             x:Class="GameTracker.Views.NewGamePage">
+<ContentPage
+    x:Class="GameTracker.Views.NewGamePage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewmodel="clr-namespace:GameTracker.ViewModels"
+    xmlns:xct="http://xamarin.com/schemas/2020/toolkit"
+    Title="{Binding Title}">
 
     <ContentPage.Behaviors>
-        <xct:EventToCommandBehavior
-            EventName="Appearing"
-            Command="{Binding OnPageAppearingCommand}" />
+        <xct:EventToCommandBehavior Command="{Binding OnPageAppearingCommand}" EventName="Appearing" />
     </ContentPage.Behaviors>
-    
+
     <ContentPage.BindingContext>
         <viewmodel:NewGameViewModel />
     </ContentPage.BindingContext>
-    
+
     <ContentPage.Content>
-        <StackLayout>
+        <StackLayout Padding="75" VerticalOptions="Center">
             <Label Text="Name: " />
             <Entry Text="{Binding Name}" />
             <Label Text="Rating: " />
@@ -38,11 +37,11 @@
             <Label Text="Studio: " />
             <Entry Text="{Binding Studio}" />
             <Label Text="Release Date: " />
-            <DatePicker Date="{Binding ReleaseDate}"
-                        MinimumDate="{Binding MinimumDate}"
-                        MaximumDate="{Binding MaximumDate}"/>
-            <Button Text="Save" 
-                    Command="{Binding SaveCommand}" />
+            <DatePicker
+                Date="{Binding ReleaseDate}"
+                MaximumDate="{Binding MaximumDate}"
+                MinimumDate="{Binding MinimumDate}" />
+            <Button Command="{Binding SaveCommand}" Text="Save" />
         </StackLayout>
     </ContentPage.Content>
 </ContentPage>
