@@ -7,7 +7,7 @@ namespace GameTracker.ViewModels
 {
     public partial class LoginViewModel : ViewModelBase
     {
-        LoginViewModel()
+        public LoginViewModel()
         {
             Title = "Login";
         }
@@ -15,7 +15,7 @@ namespace GameTracker.ViewModels
         [ICommand]
         async Task Login()
         {
-            var route = $"{nameof(GamePage)}";
+            var route = $"//{nameof(GamePage)}";
             await Shell.Current.GoToAsync(route);
         }
     }

@@ -14,18 +14,48 @@
     </ContentPage.Behaviors>
 
     <ContentPage.Content>
-        <StackLayout>
-            <StackLayout BindingContext="{Binding Game}">
-                <Label Text="{Binding Name}" />
-                <Label Text="{Binding Studio}" />
-                <Label Text="{Binding Rating}" />
-                <Label Text="{Binding ReleaseDate}" />
-                <Label Text="{Binding TimeStamp}" />
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="2*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <StackLayout
+                Grid.Column="1"
+                HorizontalOptions="StartAndExpand"
+                VerticalOptions="Center">
+                <StackLayout BindingContext="{Binding Game}">
+                    <Label
+                        FontSize="Title"
+                        HorizontalOptions="Start"
+                        Text="{Binding Name}" />
+                    <StackLayout HorizontalOptions="Start" Orientation="Horizontal">
+                        <Label Text="Studio: " />
+                        <Label
+                            Grid.Row="1"
+                            HorizontalOptions="Center"
+                            Text="{Binding Studio}" />
+                    </StackLayout>
+                    <StackLayout HorizontalOptions="Start" Orientation="Horizontal">
+                        <Label Text="Rating:" />
+                        <Label
+                            Grid.Column="1"
+                            HorizontalOptions="End"
+                            Text="{Binding Rating}" />
+                    </StackLayout>
+                    <StackLayout HorizontalOptions="Start" Orientation="Horizontal">
+                        <Label Text="Release: " />
+                        <Label HorizontalOptions="End" Text="{Binding ReleaseDate, StringFormat='{0:MMM d, yyyy}'}" />
+                    </StackLayout>
+                </StackLayout>
+                <StackLayout
+                    Padding="0,30,0,0"
+                    HorizontalOptions="CenterAndExpand"
+                    Orientation="Horizontal">
+                    <Button Command="{Binding DeleteCommand}" Text="Delete" />
+                    <Button Command="{Binding EditCommand}" Text="Edit" />
+                </StackLayout>
             </StackLayout>
-            <StackLayout>
-                <Button Command="{Binding DeleteCommand}" Text="Delete" />
-                <Button Command="{Binding EditCommand}" Text="Edit" />
-            </StackLayout>
-        </StackLayout>
+        </Grid>
     </ContentPage.Content>
 </ContentPage>

@@ -59,5 +59,15 @@ namespace GameTracker.ViewModels
             await GameService.RemoveGame(game.Id);
             await Load();
         }
+
+        [ICommand]
+        async Task Refresh()
+        {
+            IsBusy = true;
+
+            await Load();
+
+            IsBusy = false;
+        }
     }
 }

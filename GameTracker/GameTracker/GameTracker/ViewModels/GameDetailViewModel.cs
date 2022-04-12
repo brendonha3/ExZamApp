@@ -34,6 +34,10 @@ namespace GameTracker.ViewModels
         [ICommand]
         async Task Delete()
         {
+            bool answer = await Shell.Current.DisplayAlert("Delete", "Are you sure you want to delete?", "Yes", "No");
+            if (answer == false)
+                return; 
+
             await GameService.RemoveGame(gameId);
             await Shell.Current.Navigation.PopAsync();
         }
