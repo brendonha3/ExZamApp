@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage Title="{Binding Title}" 
+             xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:viewmodel="clr-namespace:GameTracker.ViewModels" 
+             xmlns:xct="http://xamarin.com/schemas/2020/toolkit"
+             x:Class="GameTracker.Views.NewGamePage">
+
+    <ContentPage.Behaviors>
+        <xct:EventToCommandBehavior
+            EventName="Appearing"
+            Command="{Binding OnPageAppearingCommand}" />
+    </ContentPage.Behaviors>
+    
+    <ContentPage.BindingContext>
+        <viewmodel:NewGameViewModel />
+    </ContentPage.BindingContext>
+    
+    <ContentPage.Content>
+        <StackLayout>
+            <Label Text="Name: " />
+            <Entry Text="{Binding Name}" />
+            <Label Text="Rating: " />
+            <Picker SelectedItem="{Binding Rating}">
+                <Picker.Items>
+                    <x:String>1</x:String>
+                    <x:String>2</x:String>
+                    <x:String>3</x:String>
+                    <x:String>4</x:String>
+                    <x:String>5</x:String>
+                    <x:String>6</x:String>
+                    <x:String>7</x:String>
+                    <x:String>8</x:String>
+                    <x:String>9</x:String>
+                    <x:String>10</x:String>
+                </Picker.Items>
+            </Picker>
+            <Label Text="Studio: " />
+            <Entry Text="{Binding Studio}" />
+            <Label Text="Release Date: " />
+            <DatePicker Date="{Binding ReleaseDate}"
+                        MinimumDate="{Binding MinimumDate}"
+                        MaximumDate="{Binding MaximumDate}"/>
+            <Button Text="Save" 
+                    Command="{Binding SaveCommand}" />
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

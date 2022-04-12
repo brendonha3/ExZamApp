@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="GameTracker.Views.GamePage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:model="clr-namespace:GameTracker.Models"
+    xmlns:viewmodels="clr-namespace:GameTracker.ViewModels"
+    xmlns:xct="http://xamarin.com/schemas/2020/toolkit"
+    Title="{Binding Title}">
+
+    <ContentPage.BindingContext>
+        <viewmodels:GameViewModel />
+    </ContentPage.BindingContext>
+
+    <ContentPage.Behaviors>
+        <xct:EventToCommandBehavior Command="{Binding LoadCommand}" EventName="Appearing" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem
+            x:Name="addItem"
+            Clicked="addItem_Clicked"
+            Command="{Binding AddCommand}"
+            Text="Add" />
+    </ContentPage.ToolbarItems>
+
+    <ContentPage.Content>
+        <StackLayout>
+            <RefreshView Command="{Binding LoadCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
+                <CollectionView
+                    x:Name="collectionView"
+                    BackgroundColor="Transparent"
+                    ItemSizingStrategy="MeasureAllItems"
+                    ItemsLayout="VerticalList"
+                    ItemsSource="{Binding Games}"
+                    RemainingItemsThreshold="1"
+                    SelectedItem="{Binding SelectedGame, Mode=TwoWay}"
+                    SelectionChanged="OnCollectionViewSelectionChanged"
+                    SelectionChangedCommand="{Binding SelectedCommand}"
+                    SelectionChangedCommandParameter="{Binding SelectedItem, Source={RelativeSource Self}}"
+                    SelectionMode="Single">
+                    <CollectionView.EmptyView>
+                        <StackLayout Padding="12">
+                            <Label HorizontalOptions="Center" Text="No games" />
+                        </StackLayout>
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="model:Game">
+                            <SwipeView>
+                                <SwipeView.RightItems>
+                                    <SwipeItems>
+                                        <SwipeItem
+                                            BackgroundColor="BlanchedAlmond"
+                                            Command="{Binding Source={x:Reference collectionView}, Path=BindingContext.RemoveCommand}"
+                                            CommandParameter="{Binding}"
+                                            Text="Delete" />
+                                    </SwipeItems>
+                                </SwipeView.RightItems>
+                                <Grid Padding="10">
+                                    <Frame HasShadow="True">
+                                        <Grid>
+                                            <Grid.RowDefinitions>
+                                                <RowDefinition />
+                                                <RowDefinition />
+                                            </Grid.RowDefinitions>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition />
+                                                <ColumnDefinition Width=".5*" />
+                                            </Grid.ColumnDefinitions>
+                                            <Label
+                                                FontSize="Large"
+                                                Text="{Binding Name}"
+                                                VerticalOptions="Center" />
+                                            <Label
+                                                Grid.Row="1"
+                                                FontSize="Small"
+                                                Text="{Binding Studio}"
+                                                VerticalOptions="Center" />
+                                            <Label
+                                                Grid.Column="1"
+                                                FontSize="Micro"
+                                                HorizontalOptions="End"
+                                                Text="{Binding ReleaseDate, StringFormat='{0:MMM d, yyyy}'}"
+                                                VerticalOptions="Center" />
+                                            <Label
+                                                Grid.Row="1"
+                                                Grid.Column="1"
+                                                FontSize="Small"
+                                                HorizontalOptions="End"
+                                                Text="{Binding Rating}"
+                                                VerticalOptions="Center" />
+                                        </Grid>
+                                    </Frame>
+                                </Grid>
+                            </SwipeView>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </RefreshView>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>

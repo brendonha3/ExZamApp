@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="GameTracker.Views.GameDetailPage"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:viewmodel="clr-namespace:GameTracker.ViewModels"
+    xmlns:xct="http://xamarin.com/schemas/2020/toolkit">
+    <ContentPage.BindingContext>
+        <viewmodel:GameDetailViewModel />
+    </ContentPage.BindingContext>
+
+    <ContentPage.Behaviors>
+        <xct:EventToCommandBehavior Command="{Binding OnPageAppearingCommand}" EventName="Appearing" />
+    </ContentPage.Behaviors>
+
+    <ContentPage.Content>
+        <StackLayout>
+            <StackLayout BindingContext="{Binding Game}">
+                <Label Text="{Binding Name}" />
+                <Label Text="{Binding Studio}" />
+                <Label Text="{Binding Rating}" />
+                <Label Text="{Binding ReleaseDate}" />
+                <Label Text="{Binding TimeStamp}" />
+            </StackLayout>
+            <StackLayout>
+                <Button Command="{Binding DeleteCommand}" Text="Delete" />
+                <Button Command="{Binding EditCommand}" Text="Edit" />
+            </StackLayout>
+        </StackLayout>
+    </ContentPage.Content>
+</ContentPage>
