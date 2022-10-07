@@ -3,67 +3,223 @@
     x:Class="GameTracker.Views.GameDetailPage"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:fa="clr-namespace:FontAwesome"
+    xmlns:models="clr-namespace:IGDB.Models;assembly=IGDB"
+    xmlns:styles="clr-namespace:GameTracker.Styles"
     xmlns:viewmodel="clr-namespace:GameTracker.ViewModels"
-    xmlns:xct="http://xamarin.com/schemas/2020/toolkit">
+    xmlns:xct="http://xamarin.com/schemas/2020/toolkit"
+    xmlns:yummy="clr-namespace:Xamarin.Forms.PancakeView;assembly=Xamarin.Forms.PancakeView">
     <ContentPage.BindingContext>
         <viewmodel:GameDetailViewModel />
     </ContentPage.BindingContext>
 
+    <ContentPage.Resources>
+        <styles:Styles />
+    </ContentPage.Resources>
+
     <ContentPage.Behaviors>
-        <xct:EventToCommandBehavior Command="{Binding OnPageAppearingCommand}" EventName="Appearing" />
+        <xct:EventToCommandBehavior Command="{Binding LoadCommand}" EventName="Appearing" />
     </ContentPage.Behaviors>
 
     <ContentPage.Content>
-        <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="2*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <StackLayout
-                Grid.Column="1"
-                HorizontalOptions="StartAndExpand"
-                VerticalOptions="Center">
-                <StackLayout BindingContext="{Binding Game}">
-                    <Label
-                        FontSize="Title"
-                        HorizontalOptions="Start"
-                        Text="{Binding Name}" />
-                    <StackLayout HorizontalOptions="Start" Orientation="Horizontal">
-                        <Label Text="Studio: " />
-                        <Label
-                            Grid.Row="1"
-                            HorizontalOptions="Center"
-                            Text="{Binding Studio}" />
-                    </StackLayout>
-                    <StackLayout HorizontalOptions="Start" Orientation="Horizontal">
-                        <Label Text="Rating:" />
-                        <Label
-                            Grid.Column="1"
-                            HorizontalOptions="End"
-                            Text="{Binding Rating}" />
-                    </StackLayout>
-                    <StackLayout HorizontalOptions="Start" Orientation="Horizontal">
-                        <Label Text="Release: " />
-                        <Label HorizontalOptions="End" Text="{Binding ReleaseDate, StringFormat='{0:MMM d, yyyy}'}" />
-                    </StackLayout>
+        <ScrollView>
+            <Grid>
+                <AbsoluteLayout>
+                    <Image
+                        AbsoluteLayout.LayoutBounds="0,0,1,1"
+                        AbsoluteLayout.LayoutFlags="All"
+                        Aspect="AspectFill"
+                        Source="{Binding Game.Cover.Value.Url}" />
+                </AbsoluteLayout>
+                <StackLayout HorizontalOptions="Center" VerticalOptions="Center">
+                    <yummy:PancakeView
+                        xct:ShadowEffect.Color="Black"
+                        BackgroundGradientEndPoint="0,0"
+                        BackgroundGradientStartPoint="0,1"
+                        CornerRadius="20"
+                        HeightRequest="700"
+                        HorizontalOptions="FillAndExpand"
+                        WidthRequest="350">
+                        <yummy:PancakeView.BackgroundGradientStops>
+                            <yummy:GradientStopCollection>
+                                <yummy:GradientStop Offset="1" Color="{StaticResource Background}" />
+                                <yummy:GradientStop Offset=".75" Color="#00" />
+                                <yummy:GradientStop Offset=".45" Color="{StaticResource Button}" />
+                                <yummy:GradientStop Offset="0" Color="{StaticResource Background}" />
+                            </yummy:GradientStopCollection>
+                        </yummy:PancakeView.BackgroundGradientStops>
+                        <StackLayout Margin="10">
+                            <Label
+                                xct:ShadowEffect.Color="Black"
+                                FontSize="26"
+                                Style="{StaticResource headerLabel}"
+                                Text="{Binding Game.Name}" />
+                            <AbsoluteLayout HeightRequest="250">
+                                <CarouselView ItemsSource="{Binding Screenshots}">
+                                    <CarouselView.ItemTemplate>
+                                        <DataTemplate>
+                                            <yummy:PancakeView>
+                                                <Image
+                                                    xct:CornerRadiusEffect.CornerRadius="20"
+                                                    Aspect="AspectFill"
+                                                    HorizontalOptions="CenterAndExpand"
+                                                    Source="{Binding Url}" />
+                                            </yummy:PancakeView>
+                                        </DataTemplate>
+                                    </CarouselView.ItemTemplate>
+                                </CarouselView>
+                                <StackLayout
+                                    AbsoluteLayout.LayoutBounds="240,200,1,.15"
+                                    AbsoluteLayout.LayoutFlags="SizeProportional"
+                                    Orientation="Horizontal">
+                                    <Grid RowSpacing="0">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="30" />
+                                            <RowDefinition Height="20" />
+                                        </Grid.RowDefinitions>
+                                        <yummy:PancakeView
+                                            BackgroundColor="{StaticResource Background}"
+                                            Border="{yummy:BorderMarkup Color={StaticResource Button},
+                                                                        Thickness='2'}"
+                                            CornerRadius="40">
+                                            <Label
+                                                HorizontalOptions="Center"
+                                                Style="{StaticResource textLabel}"
+                                                Text="{Binding Game.AggregatedRating}"
+                                                VerticalOptions="Center" />
+                                        </yummy:PancakeView>
+                                        <Label
+                                            Grid.Row="1"
+                                            xct:ShadowEffect.Color="Black"
+                                            HorizontalOptions="Center"
+                                            Style="{StaticResource headerLabel}"
+                                            Text="Critic"
+                                            TextColor="White" />
+                                        <yummy:PancakeView
+                                            Grid.Column="1"
+                                            BackgroundColor="{StaticResource Background}"
+                                            Border="{yummy:BorderMarkup Color={StaticResource Button},
+                                                                        Thickness='2'}"
+                                            CornerRadius="40">
+                                            <Label
+                                                HorizontalOptions="Center"
+                                                Style="{StaticResource textLabel}"
+                                                Text="{Binding Game.Rating}"
+                                                VerticalOptions="Center" />
+                                        </yummy:PancakeView>
+                                        <Label
+                                            Grid.Row="1"
+                                            Grid.Column="1"
+                                            xct:ShadowEffect.Color="Black"
+                                            HorizontalOptions="Center"
+                                            Style="{StaticResource headerLabel}"
+                                            Text="User"
+                                            TextColor="White" />
+                                    </Grid>
+                                </StackLayout>
+                            </AbsoluteLayout>
+                            <yummy:PancakeView
+                                BackgroundColor="{StaticResource Background}"
+                                Border="{yummy:BorderMarkup Color={StaticResource Button},
+                                                            Thickness='2'}"
+                                CornerRadius="20"
+                                HeightRequest="150"
+                                VerticalOptions="FillAndExpand">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="40" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <Grid BackgroundColor="{StaticResource Primary}">
+                                        <Button
+                                            Grid.Column="0"
+                                            Command="{Binding UpdateWishCommand}"
+                                            FontFamily="{StaticResource FontAwesomeBrands}"
+                                            FontSize="20"
+                                            Text="{x:Static fa:FontAwesomeIcons.Heart}"
+                                            TextColor="{StaticResource FalseColor}">
+                                            <Button.Triggers>
+                                                <DataTrigger
+                                                    Binding="{Binding Settings.IsWishlist}"
+                                                    TargetType="Button"
+                                                    Value="true">
+                                                    <Setter Property="TextColor" Value="{StaticResource WishColor}" />
+                                                </DataTrigger>
+                                            </Button.Triggers>
+                                        </Button>
+                                        <Button
+                                            Grid.Column="1"
+                                            Command="{Binding UpdateFavoriteCommand}"
+                                            FontFamily="{StaticResource FontAwesomeBrands}"
+                                            FontSize="20"
+                                            Text="{x:Static fa:FontAwesomeIcons.Bookmark}"
+                                            TextColor="{StaticResource FalseColor}">
+                                            <Button.Triggers>
+                                                <DataTrigger
+                                                    Binding="{Binding Settings.IsFavorite}"
+                                                    TargetType="Button"
+                                                    Value="true">
+                                                    <Setter Property="TextColor" Value="{StaticResource FavoriteColor}" />
+                                                </DataTrigger>
+                                            </Button.Triggers>
+                                        </Button>
+                                        <Button
+                                            Grid.Column="2"
+                                            Command="{Binding UpdateOwnedCommand}"
+                                            FontFamily="{StaticResource FontAwesomeRegular}"
+                                            FontSize="20"
+                                            Text="{x:Static fa:FontAwesomeIcons.CircleCheck}"
+                                            TextColor="{StaticResource FalseColor}">
+                                            <Button.Triggers>
+                                                <DataTrigger
+                                                    Binding="{Binding Settings.IsOwned}"
+                                                    TargetType="Button"
+                                                    Value="true">
+                                                    <Setter Property="TextColor" Value="{StaticResource OwnedColor}" />
+                                                </DataTrigger>
+                                            </Button.Triggers>
+                                        </Button>
+                                        <Button
+                                            Grid.Column="3"
+                                            FontFamily="{StaticResource FontAwesomeBrands}"
+                                            FontSize="20"
+                                            Text="{x:Static fa:FontAwesomeIcons.EarthAmericas}" />
+                                    </Grid>
+                                    <ScrollView Grid.Row="1">
+                                        <StackLayout Margin="10,0,10,10">
+                                            <StackLayout Orientation="Horizontal">
+                                                <Label
+                                                    MinimumWidthRequest="55"
+                                                    Style="{StaticResource headerLabel}"
+                                                    Text="Genres:" />
+                                                <Label Style="{StaticResource textLabel}" Text="{Binding Description.Genres}" />
+                                            </StackLayout>
+                                            <StackLayout Orientation="Horizontal">
+                                                <Label
+                                                    MinimumWidthRequest="75"
+                                                    Style="{StaticResource headerLabel}"
+                                                    Text="Platforms:" />
+                                                <Label Style="{StaticResource textLabel}" Text="{Binding Description.Platforms}" />
+                                            </StackLayout>
+                                            <StackLayout Orientation="Horizontal">
+                                                <Label
+                                                    MinimumWidthRequest="75"
+                                                    Style="{StaticResource headerLabel}"
+                                                    Text="Release:" />
+                                                <Label Style="{StaticResource textLabel}" Text="{Binding Game.FirstReleaseDate, StringFormat='{}{0:MMM dd, yyyy}'}" />
+                                            </StackLayout>
+                                            <StackLayout Margin="0,5,0,0">
+                                                <Label Style="{StaticResource headerLabel}" Text="Summary:" />
+                                                <Label Style="{StaticResource textLabel}" Text="{Binding Game.Summary}" />
+                                            </StackLayout>
+                                        </StackLayout>
+                                    </ScrollView>
+                                </Grid>
+                            </yummy:PancakeView>
+                        </StackLayout>
+                    </yummy:PancakeView>
                 </StackLayout>
-                <StackLayout
-                    Padding="0,30,0,0"
-                    HorizontalOptions="CenterAndExpand"
-                    Orientation="Horizontal">
-                    <Button
-                        x:Name="deleteItem"
-                        Clicked="deleteItem_Clicked"
-                        Command="{Binding DeleteCommand}"
-                        Text="Delete" />
-                    <Button
-                        x:Name="editItem"
-                        Clicked="editItem_Clicked"
-                        Command="{Binding EditCommand}"
-                        Text="Edit" />
-                </StackLayout>
-            </StackLayout>
-        </Grid>
+            </Grid>
+        </ScrollView>
     </ContentPage.Content>
 </ContentPage>

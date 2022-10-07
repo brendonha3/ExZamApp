@@ -16,15 +16,5 @@ namespace GameTracker.Views
         {
             InitializeComponent();
         }
-
-        private void deleteItem_Clicked(object sender, EventArgs e)
-        {
-            deleteItem.IsEnabled = true;
-        }
-
-        private void editItem_Clicked(object sender, EventArgs e)
-        {
-            editItem.IsEnabled = true;
-        }
     }
 }

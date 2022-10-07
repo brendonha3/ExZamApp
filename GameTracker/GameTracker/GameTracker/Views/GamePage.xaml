@@ -3,100 +3,174 @@
     x:Class="GameTracker.Views.GamePage"
     xmlns="http://xamarin.com/schemas/2014/forms"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:model="clr-namespace:GameTracker.Models"
+    xmlns:fa="clr-namespace:FontAwesome"
+    xmlns:models="clr-namespace:IGDB.Models;assembly=IGDB"
+    xmlns:styles="clr-namespace:GameTracker.Styles"
     xmlns:viewmodels="clr-namespace:GameTracker.ViewModels"
     xmlns:xct="http://xamarin.com/schemas/2020/toolkit"
-    Title="{Binding Title}">
-
-    <ContentPage.BindingContext>
-        <viewmodels:GameViewModel />
-    </ContentPage.BindingContext>
+    xmlns:yummy="clr-namespace:Xamarin.Forms.PancakeView;assembly=Xamarin.Forms.PancakeView"
+    x:Name="BrowseItemsPage"
+    Title="{Binding Title}"
+    Padding="{OnPlatform iOS='0,60,0,0'}"
+    BackgroundColor="{StaticResource Background}"
+    NavigationPage.HasNavigationBar="False"
+    Shell.NavBarIsVisible="False">
+    <ContentPage.Resources>
+        <styles:Styles />
+    </ContentPage.Resources>
 
     <ContentPage.Behaviors>
         <xct:EventToCommandBehavior Command="{Binding LoadCommand}" EventName="Appearing" />
     </ContentPage.Behaviors>
 
-    <ContentPage.ToolbarItems>
-        <ToolbarItem
-            x:Name="addItem"
-            Clicked="addItem_Clicked"
-            Command="{Binding AddCommand}"
-            Text="Add" />
-    </ContentPage.ToolbarItems>
+    <ContentPage.BindingContext>
+        <viewmodels:GameViewModel />
+    </ContentPage.BindingContext>
 
-    <ContentPage.Content>
-        <StackLayout>
-            <RefreshView Command="{Binding RefreshCommand}" IsRefreshing="{Binding IsBusy, Mode=TwoWay}">
-                <CollectionView
-                    x:Name="collectionView"
-                    BackgroundColor="Transparent"
-                    ItemSizingStrategy="MeasureAllItems"
-                    ItemsLayout="VerticalList"
-                    ItemsSource="{Binding Games}"
-                    RemainingItemsThreshold="1"
-                    SelectedItem="{Binding SelectedGame, Mode=TwoWay}"
-                    SelectionChanged="OnCollectionViewSelectionChanged"
-                    SelectionChangedCommand="{Binding SelectedCommand}"
-                    SelectionChangedCommandParameter="{Binding SelectedItem, Source={RelativeSource Self}}"
-                    SelectionMode="Single">
-                    <CollectionView.EmptyView>
-                        <StackLayout Padding="12">
-                            <Label HorizontalOptions="Center" Text="No games" />
-                        </StackLayout>
-                    </CollectionView.EmptyView>
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="model:Game">
-                            <SwipeView>
-                                <SwipeView.RightItems>
-                                    <SwipeItems>
-                                        <SwipeItem
-                                            BackgroundColor="BlanchedAlmond"
-                                            Command="{Binding Source={x:Reference collectionView}, Path=BindingContext.RemoveCommand}"
-                                            CommandParameter="{Binding}"
-                                            Text="Delete" />
-                                    </SwipeItems>
-                                </SwipeView.RightItems>
-                                <Grid Padding="10">
-                                    <Frame HasShadow="True">
-                                        <Grid>
-                                            <Grid.RowDefinitions>
-                                                <RowDefinition />
-                                                <RowDefinition />
-                                            </Grid.RowDefinitions>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition />
-                                                <ColumnDefinition Width=".5*" />
-                                            </Grid.ColumnDefinitions>
-                                            <Label
-                                                FontSize="Large"
-                                                Text="{Binding Name}"
-                                                VerticalOptions="Center" />
-                                            <Label
-                                                Grid.Row="1"
-                                                FontSize="Small"
-                                                Text="{Binding Studio}"
-                                                VerticalOptions="Center" />
-                                            <Label
-                                                Grid.Column="1"
-                                                FontSize="Micro"
-                                                HorizontalOptions="End"
-                                                Text="{Binding ReleaseDate, StringFormat='{0:MMM d, yyyy}'}"
-                                                VerticalOptions="Center" />
-                                            <Label
-                                                Grid.Row="1"
-                                                Grid.Column="1"
-                                                FontSize="Small"
-                                                HorizontalOptions="End"
-                                                Text="{Binding Rating}"
-                                                VerticalOptions="Center" />
-                                        </Grid>
-                                    </Frame>
-                                </Grid>
-                            </SwipeView>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </RefreshView>
+    <StackLayout>
+        <Grid HeightRequest="75">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <StackLayout Grid.Column="0" Margin="20">
+                <StackLayout Orientation="Horizontal">
+                    <Label
+                        FontSize="30"
+                        Style="{StaticResource headerLabel}"
+                        Text="Game" />
+                    <Label
+                        FontSize="30"
+                        Style="{StaticResource textLabel}"
+                        Text="Tracker" />
+                </StackLayout>
+            </StackLayout>
+        </Grid>
+        <yummy:PancakeView Margin="10,10,10,0" CornerRadius="15">
+            <SearchBar
+                BackgroundColor="White"
+                SearchCommand="{Binding SearchCommand}"
+                SearchCommandParameter="{Binding SearchTerm}"
+                Text="{Binding SearchTerm, Mode=TwoWay}" />
+        </yummy:PancakeView>
+        <StackLayout HorizontalOptions="CenterAndExpand" Orientation="Horizontal">
+            <Button
+                Command="{Binding SavedGamesButtonCommand}"
+                CommandParameter="wishlist"
+                FontFamily="{StaticResource FontAwesomeBrands}"
+                FontSize="20"
+                Text="{x:Static fa:FontAwesomeIcons.Heart}"
+                TextColor="{StaticResource FalseColor}">
+                <Button.Triggers>
+                    <DataTrigger
+                        Binding="{Binding IsWishlistGame}"
+                        TargetType="Button"
+                        Value="true">
+                        <Setter Property="TextColor" Value="{StaticResource WishColor}" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+            <Button
+                Command="{Binding SavedGamesButtonCommand}"
+                CommandParameter="favorite"
+                FontFamily="{StaticResource FontAwesomeBrands}"
+                FontSize="20"
+                Text="{x:Static fa:FontAwesomeIcons.Bookmark}"
+                TextColor="{StaticResource FalseColor}">
+                <Button.Triggers>
+                    <DataTrigger
+                        Binding="{Binding IsFavoriteGame}"
+                        TargetType="Button"
+                        Value="true">
+                        <Setter Property="TextColor" Value="{StaticResource FavoriteColor}" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+            <Button
+                Command="{Binding SavedGamesButtonCommand}"
+                CommandParameter="owned"
+                FontFamily="{StaticResource FontAwesomeRegular}"
+                FontSize="20"
+                Text="{x:Static fa:FontAwesomeIcons.CircleCheck}"
+                TextColor="{StaticResource FalseColor}">
+                <Button.Triggers>
+                    <DataTrigger
+                        Binding="{Binding IsOwnedGame}"
+                        TargetType="Button"
+                        Value="true">
+                        <Setter Property="TextColor" Value="{StaticResource OwnedColor}" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
         </StackLayout>
-    </ContentPage.Content>
+        <RefreshView Command="{Binding LoadCommand}" IsRefreshing="{Binding IsBusy, Mode=OneWay}">
+            <CollectionView
+                x:Name="ItemsListView"
+                ItemsSource="{Binding Games}"
+                RemainingItemsThreshold="0"
+                RemainingItemsThresholdReachedCommand="{Binding ThresholdReachedCommand}"
+                RemainingItemsThresholdReachedCommandParameter="{Binding SearchTerm}"
+                SelectedItem="{Binding SelectedGame}"
+                SelectionChangedCommand="{Binding SelectedCommand}"
+                SelectionChangedCommandParameter="{Binding SelectedGame}"
+                SelectionMode="Single"
+                VerticalOptions="FillAndExpand">
+                <CollectionView.EmptyView>
+                    <yummy:PancakeView>
+                        <Label
+                            FontSize="20"
+                            HorizontalOptions="Center"
+                            Style="{StaticResource headerLabel}"
+                            Text="{Binding EmptyViewText}" />
+                    </yummy:PancakeView>
+                </CollectionView.EmptyView>
+                <CollectionView.ItemsLayout>
+                    <LinearItemsLayout ItemSpacing="5" Orientation="Vertical" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="models:Game">
+                        <yummy:PancakeView
+                            BackgroundColor="{StaticResource Button}"
+                            HeightRequest="120"
+                            HorizontalOptions="FillAndExpand"
+                            Style="{StaticResource selection}">
+                            <AbsoluteLayout>
+                                <Image
+                                    AbsoluteLayout.LayoutBounds="0,0,1,1"
+                                    AbsoluteLayout.LayoutFlags="All"
+                                    Aspect="AspectFill"
+                                    Source="{Binding Cover.Value.Url}" />
+                                <Label
+                                    Margin="10,10,40,0"
+                                    xct:ShadowEffect.Color="Black"
+                                    FontSize="18"
+                                    Style="{StaticResource headerLabel}"
+                                    Text="{Binding Name}" />
+                                <yummy:PancakeView
+                                    AbsoluteLayout.LayoutBounds="-10,10,1,.25"
+                                    AbsoluteLayout.LayoutFlags="SizeProportional"
+                                    BackgroundColor="{StaticResource Button}"
+                                    Border="{yummy:BorderMarkup Color={StaticResource Accent},
+                                                                Thickness='1'}"
+                                    CornerRadius="15"
+                                    HorizontalOptions="EndAndExpand"
+                                    WidthRequest="30">
+                                    <StackLayout
+                                        HorizontalOptions="Center"
+                                        Orientation="Horizontal"
+                                        VerticalOptions="Center">
+                                        <Label
+                                            FontSize="16"
+                                            Style="{StaticResource headerLabel}"
+                                            Text="{Binding TotalRating}"
+                                            TextColor="White" />
+                                    </StackLayout>
+                                </yummy:PancakeView>
+                            </AbsoluteLayout>
+                        </yummy:PancakeView>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </RefreshView>
+    </StackLayout>
 </ContentPage>

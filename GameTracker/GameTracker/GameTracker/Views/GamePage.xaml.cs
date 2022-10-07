@@ -16,17 +16,5 @@ namespace GameTracker.Views
         {
             InitializeComponent();
         }
-
-        // nulling selecteditem in collectionview required to select the same item multiple times
-        void OnCollectionViewSelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ((CollectionView)sender).SelectedItem = null;
-        }
-
-        // toolbar items must be re-enabled or they disable when clicked
-        private void addItem_Clicked(object sender, EventArgs e)
-        {
-            addItem.IsEnabled = true;
-        }
     }
 }
