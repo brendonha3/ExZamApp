@@ -1,77 +1,175 @@
-﻿using CommunityToolkit.Diagnostics;
-using GameTracker.Models;
-using SQLite;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using GameTracker.Helpers;
+using IGDB;
+using IGDB.Models;
 using System.Threading.Tasks;
-using Xamarin.Essentials;
 
 namespace GameTracker.Services
 {
     public static class GameService
     {
-        static SQLiteAsyncConnection db;
+        private static IGDBClient? _client;
 
-        static async Task Init()
+        /// <summary>
+        /// Init to ensure that the httpclient is always active
+        /// </summary>
+        private static void Init()
         {
-            if (db != null)
+            if (_client != null)
                 return;
 
-            var databasePath = Path.Combine(FileSystem.AppDataDirectory, "MyData.db");
-
-            db = new SQLiteAsyncConnection(databasePath);
-
-            await db.CreateTableAsync<Game>();
+            _client = new IGDBClient(
+                "aa8j5sctlvcfel9yepmouol48roqhx",
+                "83niixjlw4du8plaktbi8ovvndvjw2"
+            );
         }
 
-        public static async Task AddGame(string name, int rating, string studio, DateTime releaseDate)
+        /// <summary>
+        /// Queries top20 most popular games
+        /// </summary>
+        /// <returns>Game[]</returns>
+        public static async Task<Game[]> GetTopRatedGames()
         {
-            await Init();
+            Init();
 
-            var game = new Game
-            {
-                Name = name,
-                Rating = rating,
-                Studio = studio,
-                ReleaseDate = releaseDate,
-                TimeStamp = DateTime.Now,
-            };
-
-            await db.InsertAsync(game);
+            return await _client!.QueryAsync<Game>(IGDBClient.Endpoints.Games,
+                query: @"fields *, 
+                        collection.name,
+                        cover.url,
+                        genres.name,
+                        platforms.name,
+                        release_dates.date,
+                        screenshots.url;
+                        sort total_rating_count desc;                           
+                        where total_rating != null & 
+                        total_rating_count > 10 &
+                        version_parent = null;
+                        limit 20;");
         }
 
-        public static async Task RemoveGame(int id)
+        /// <summary>
+        /// Queries an additional top20 popular games
+        /// Starting off on the last game on the existing list
+        /// </summary>
+        /// <param name="lastGameCount"></param>
+        /// <returns></returns>
+        public static async Task<Game[]> GetTopRatedGamesThreshold(int lastGameCount)
         {
-            await Init();
+            Init();
 
-            await db.DeleteAsync<Game>(id);
+            return await _client!.QueryAsync<Game>(IGDBClient.Endpoints.Games,
+                query: @"fields *, 
+                        collection.name,
+                        cover.url,
+                        genres.name,
+                        platforms.name,
+                        release_dates.date,
+                        screenshots.url;
+                        limit 20;
+                        sort total_rating_count desc;                           
+                        where total_rating != null & 
+                        total_rating_count > 10 &
+                        version_parent = null & " +
+                        "total_rating_count < " + lastGameCount + ";");
         }
 
-        public static async Task<IEnumerable<Game>> GetGame()
+        /// <summary>
+        /// Queries a single game
+        /// </summary>
+        /// <param name="id">GameID</param>
+        /// <returns>Game[]</returns>
+        public static async Task<Game[]> GetGame(long id)
         {
-            await Init();
+            Init();
 
-            var games = await db.Table<Game>().ToListAsync();
-
-            return games;
+            return await _client!.QueryAsync<Game>(IGDBClient.Endpoints.Games,
+                query: @"fields *, 
+                        collection.name,
+                        cover.url,
+                        genres.name,
+                        platforms.name,
+                        release_dates.date,
+                        screenshots.url;
+                        sort aggregated_rating desc;                           
+                        where id = " + id.ToString() + ";");
         }
 
-        public static async Task<Game> GetGame(int id)
+        /// <summary>
+        /// Queries API based on searchterm
+        /// Total_rating_count and version_parent are to keep out unknown games
+        /// </summary>
+        /// <param name="searchTerm"></param>
+        /// <returns>Game[]</returns>
+        public static async Task<Game[]> GetSearchedGames(string searchTerm)
         {
-            await Init();
+            Init();
 
-            var game = await db.Table<Game>()
-                .FirstOrDefaultAsync(c => c.Id == id);
-
-            return game;
+            return await _client!.QueryAsync<Game>(IGDBClient.Endpoints.Games,
+                 query: @"fields *, 
+                        collection.name,
+                        cover.url,
+                        genres.name,
+                        platforms.name,
+                        release_dates.date,
+                        screenshots.url;
+                        sort total_rating_count desc;
+                        limit 20;" +
+                        "where name ~ *\""+ searchTerm + "\"* & " +
+                        "total_rating_count > 5 & " +
+                        "version_parent = null;");
         }
 
-        public static async Task UpdateGame(Game game)
+        /// <summary>
+        /// Queries an additional 20 games
+        /// Starting off on the last game on the existing list
+        /// and matching on the name
+        /// </summary>
+        /// <param name="searchTerm"></param>
+        /// <param name="lastGameScore"></param>
+        /// <returns></returns>
+        public static async Task<Game[]> GetSearchedGamesThreshold(string searchTerm, int lastGameScore)
         {
-            await Init();
+            Init();
 
-            await db.UpdateAsync(game);
+            return await _client!.QueryAsync<Game>(IGDBClient.Endpoints.Games,
+                 query: @"fields *, 
+                        collection.name,
+                        cover.url,
+                        genres.name,
+                        platforms.name,
+                        release_dates.date,
+                        screenshots.url;
+                        sort total_rating_count desc;
+                        limit 20;" +
+                        "where name ~ *\"" + searchTerm + "\"* & " +
+                        "total_rating_count < " + lastGameScore + "& " +
+                        "total_rating_count > 2 & " +
+                        "version_parent = null;");
+        }
+
+        /// <summary>
+        /// Queries based on a sorted list of gameIDs tied to games
+        /// that have been saved
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns>Game[]</returns>
+        public static async Task<Game[]> GetSavedGames(long[] ids)
+        {
+            Init();
+
+            if (ids.Length == 0)
+               return new Game[0];
+
+            var idString = GameHelper.FormatNumberArray(ids);
+
+            return await _client!.QueryAsync<Game>(IGDBClient.Endpoints.Games,
+                 query: @"fields *, 
+                        collection.name,
+                        cover.url,
+                        genres.name,
+                        platforms.name,
+                        release_dates.date,
+                        screenshots.url;
+                        where id = (" + idString + ");");
         }
     }
 }

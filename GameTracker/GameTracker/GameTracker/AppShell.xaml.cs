@@ -12,12 +12,6 @@ namespace GameTracker
         {
             InitializeComponent();
             Routing.RegisterRoute(nameof(GameDetailPage), typeof(GameDetailPage));
-            Routing.RegisterRoute(nameof(NewGamePage), typeof(NewGamePage));
-        }
-
-        private async void OnMenuItemClicked(object sender, EventArgs e)
-        {
-            await Shell.Current.GoToAsync("//LoginPage");
         }
     }
 }

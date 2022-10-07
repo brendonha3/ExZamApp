@@ -1,15 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Application xmlns="http://xamarin.com/schemas/2014/forms"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="GameTracker.App">
+<Application
+    x:Class="GameTracker.App"
+    xmlns="http://xamarin.com/schemas/2014/forms"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
     <!--
         Define global resources and styles here, that apply to all pages in your app.
     -->
     <Application.Resources>
         <ResourceDictionary>
-            <Color x:Key="Primary">#2196F3</Color>
+            <Color x:Key="Primary">#2C3333</Color>
+            <Color x:Key="Background">#2C3333</Color>
+            <Color x:Key="Font">White</Color>
+            <Color x:Key="Button">#395B64</Color>
+            <Color x:Key="Accent">#E7F6F2</Color>
+            <Color x:Key="OwnedColor">#81C784</Color>
+            <Color x:Key="FavoriteColor">#7986CB</Color>
+            <Color x:Key="WishColor">#E57373</Color>
+            <Color x:Key="FalseColor">#FAFAFA</Color>
+
             <Style TargetType="Button">
-                <Setter Property="TextColor" Value="White"></Setter>
+                <Setter Property="TextColor" Value="White" />
                 <Setter Property="VisualStateManager.VisualStateGroups">
                     <VisualStateGroupList>
                         <VisualStateGroup x:Name="CommonStates">
@@ -27,6 +37,20 @@
                     </VisualStateGroupList>
                 </Setter>
             </Style>
-        </ResourceDictionary>        
+
+            <OnPlatform x:Key="FontAwesomeSolid" x:TypeArguments="x:String">
+                <On Platform="Android" Value="FontAwesome6-Brands-Regular-400.otf#Regular" />
+                <On Platform="iOS" Value="FontAwesome6Brands-Regular" />
+            </OnPlatform>
+            <OnPlatform x:Key="FontAwesomeBrands" x:TypeArguments="x:String">
+                <On Platform="Android" Value="FontAwesome6-Solid-900.otf#Regular" />
+                <On Platform="iOS" Value="FontAwesome6Free-Solid" />
+            </OnPlatform>
+            <OnPlatform x:Key="FontAwesomeRegular" x:TypeArguments="x:String">
+                <On Platform="Android" Value="FontAwesome6-Regular-400.otf#Regular" />
+                <On Platform="iOS" Value="FontAwesome6Free-Regular" />
+            </OnPlatform>
+
+        </ResourceDictionary>
     </Application.Resources>
 </Application>
