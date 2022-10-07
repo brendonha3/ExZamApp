@@ -1,13 +1,14 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using GameTracker.Helpers;
 using GameTracker.Models;
 using GameTracker.Services;
-using GameTracker.Views;
-using System;
-using System.Collections.Generic;
-using System.Text;
+using IGDB.Models;
+using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Xamarin.Forms;
+using Xamarin.Forms.Internals;
 
 namespace GameTracker.ViewModels
 {
@@ -15,43 +16,66 @@ namespace GameTracker.ViewModels
     public partial class GameDetailViewModel : ViewModelBase
     {
         [ObservableProperty]
-        private int gameId;
+        private int _gameId;
 
         [ObservableProperty]
-        private Game game;
+        private Game? _game;
+
+        [ObservableProperty]
+        private ObservableCollection<Screenshot> _screenshots;
+
+        [ObservableProperty]
+        private GameDescription _description;
+
+        [ObservableProperty]
+        private GameSettings _settings;
+
 
         public GameDetailViewModel()
         {
             Title = "Game details";
+
+            Screenshots = new ObservableCollection<Screenshot>();         
         }
 
-        [ICommand]
-        async Task OnPageAppearing()
+        /// <summary>
+        /// Loads a Game[] from API based on passed gameId param from previous page
+        /// and moves and formats properties from the selected game into classes that are xaml friendly.
+        /// </summary>
+        /// <returns></returns>
+        [RelayCommand]
+        async Task Load()
         {
-            await LoadGame();
+            var gameResult = await GameService.GetGame(_gameId);
+
+            Game = GameHelper.FormatGameFields(gameResult.FirstOrDefault());
+
+            Game.Screenshots.Values.ForEach(ss => Screenshots.Add(ss));
+
+            Screenshots.ForEach(ss => ss.Url = GameHelper.FormatUrl(ss.Url));
+
+            Description = GameHelper.FormatDescription(Game);
+
+            Settings = await GameSettingsService.GetGameSettings(_gameId) 
+                       ?? new GameSettings() { GameId = _gameId };
         }
 
-        [ICommand]
-        async Task Delete()
+        [RelayCommand]
+        public async Task UpdateOwned()
         {
-            bool answer = await Shell.Current.DisplayAlert("Delete", "Are you sure you want to delete?", "Yes", "No");
-            if (answer == false)
-                return; 
-
-            await GameService.RemoveGame(gameId);
-            await Shell.Current.Navigation.PopAsync();
+            Settings = await GameSettingsService.UpdateOwnedSetting(_gameId);
         }
 
-        [ICommand]
-        async Task Edit()
+        [RelayCommand]
+        public async Task UpdateFavorite()
         {
-            await Shell.Current.GoToAsync($"{nameof(NewGamePage)}?GameId={gameId}");
+            Settings = await GameSettingsService.UpdateFavoriteSetting(_gameId);
         }
 
-        [ICommand]
-        async Task LoadGame()
+        [RelayCommand]
+        public async Task UpdateWish()
         {
-            Game = await GameService.GetGame(gameId);
+            Settings = await GameSettingsService.UpdateWishSetting(_gameId);
         }
     }
 }
